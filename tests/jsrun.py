@@ -62,14 +62,13 @@ def check_engine(engine):
   if engine_path not in WORKING_ENGINES:
     try:
       logging.debug('Checking JS engine %s' % engine)
-      output = run_js(shared.path_from_root('tests', 'hello_world.js'), engine,
-                      skip_check=True)
-      print(output)
+      output = run_js(shared.path_from_root('tests', 'hello_world.js'), engine, skip_check=True)
       if 'hello, world!' in output:
         WORKING_ENGINES[engine_path] = True
       else:
         WORKING_ENGINES[engine_path] = False
     except Exception as e:
+      print(output)
       logging.info('Checking JS engine %s failed. Check your config file. Details: %s' % (str(engine), str(e)))
       WORKING_ENGINES[engine_path] = False
   return WORKING_ENGINES[engine_path]
