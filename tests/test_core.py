@@ -1460,6 +1460,10 @@ int main(int argc, char **argv)
     self.do_run(src, 'OK\n')
 
   @with_both_exception_handling
+  def test_exceptions_uncaught_addref(self):
+    self.do_run_in_out_file_test('tests', 'core', 'test_exceptions_uncaught_addref')
+
+  @with_both_exception_handling
   def test_exceptions_typed(self):
     # needs to flush stdio streams
     self.set_setting('EXIT_RUNTIME', 1)

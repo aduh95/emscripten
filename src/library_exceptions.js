@@ -171,6 +171,7 @@ var LibraryExceptions = {
 
   __cxa_begin_catch__deps: ['$exceptionInfos', '$exceptionCaught', '$exception_addRef', '$exception_deAdjust', '_ZSt18uncaught_exceptionv'],
   __cxa_begin_catch: function(ptr) {
+    ptr = exception_deAdjust(ptr);
     var info = exceptionInfos[ptr];
     if (info && !info.caught) {
       info.caught = true;
@@ -181,7 +182,7 @@ var LibraryExceptions = {
 #if EXCEPTION_DEBUG
     err('cxa_begin_catch ' + [ptr, 'stack', exceptionCaught]);
 #endif
-    exception_addRef(exception_deAdjust(ptr));
+    exception_addRef(ptr);
     return ptr;
   },
 
