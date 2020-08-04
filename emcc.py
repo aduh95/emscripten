@@ -2837,6 +2837,8 @@ There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR P
 
       if final_suffix in WASM_ENDINGS:
         js_target = misc_temp_files.get(suffix='.js').name
+      elif final_suffix == '.html':
+        js_target = unsuffixed(target) + '.js'
       else:
         js_target = target
 
