@@ -10518,3 +10518,18 @@ int main () {
     # Test that `-shared` forces object file output regardless of output filename
     self.run_process([EMCC, '-shared', path_from_root('tests', 'hello_world.c'), '-o', 'out.js'])
     self.assertIsObjectFile('out.js')
+
+  @no_windows('windows does not support shbang syntax')
+  def test_EXECUTABLE(self):
+    self.run_process([EMCC, path_from_root('tests', 'hello_world.c'), '-o', 'out.js', '-sEXECUTABLE'])
+    # Test that output is directly runnable without any engine
+    output = self.run_process([os.path.abspath('out.js')], stdout=PIPE).stdout
+    self.assertContained('hello, world!', output)
+
+    # Verify that EM_JS_ENGINE can be used to override the #! line and that args can be included
+    with env_modify({'EM_JS_ENGINE': '%s --no-warnings' % NODE_JS[0]}):
+      self.run_process([EMCC, path_from_root('tests', 'hello_world.c'), '-o', 'out.js', '-sEXECUTABLE'])
+
+    self.assertContained('--no-warnings', open('out.js').readlines()[0])
+    output = self.run_process([os.path.abspath('out.js')], stdout=PIPE).stdout
+    self.assertContained('hello, world!', output)

@@ -1799,6 +1799,11 @@ var WASM2C = 0;
 // in a custom location.
 var SEPARATE_DWARF_URL = '';
 
+// Add a #! line output JavaScript file and make it executable.  This command
+// used to run the output can be configured via the .emscripten config file using
+// the JS_ENGINE setting and defaults to NODE_JS.
+var EXECUTABLE = '';
+
 //===========================================
 // Internal, used for testing only, from here
 //===========================================

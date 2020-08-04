@@ -18,6 +18,7 @@ import re
 import shutil
 import subprocess
 import time
+import shlex
 import sys
 import tempfile
 
@@ -337,7 +338,7 @@ def parse_config_file():
 
   Also also EM_<KEY> environment variables to override specific config keys.
   """
-  global JS_ENGINES, JAVA, CLOSURE_COMPILER
+  global JS_ENGINE, JS_ENGINES, JAVA, CLOSURE_COMPILER
 
   config = {}
   config_text = open(CONFIG_FILE, 'r').read() if CONFIG_FILE else EM_CONFIG
@@ -358,6 +359,7 @@ def parse_config_file():
     'CLANG_ADD_VERSION',
     'CLOSURE_COMPILER',
     'JAVA',
+    'JS_ENGINE',
     'JS_ENGINES',
     'WASMER',
     'WASMTIME',
@@ -367,11 +369,17 @@ def parse_config_file():
     'PORTS',
   )
 
+  # A subset of the above keys that represent commands. In this case its useful to
+  # use shlex.split on the environment variable.
+  COMMAND_KEYS = ('NODE_JS', 'JAVA', 'WASMER', 'WASMTIME', 'JS_ENGINE', 'CLOSURE_COMPILER')
+
   # Only propagate certain settings from the config file.
   for key in CONFIG_KEYS:
     env_var = 'EM_' + key
     env_value = os.environ.get(env_var)
     if env_value is not None:
+      if key in COMMAND_KEYS:
+        env_value = shlex.split(env_value)
       globals()[key] = env_value
     elif key in config:
       globals()[key] = config[key]
@@ -389,6 +397,8 @@ def parse_config_file():
   # EM_CONFIG stuff
   if not JS_ENGINES:
     JS_ENGINES = [NODE_JS]
+  if not JS_ENGINE:
+    JS_ENGINE = JS_ENGINES[0]
 
   if CLOSURE_COMPILER is None:
     if WINDOWS:
@@ -1699,6 +1709,7 @@ CLANG_ADD_VERSION = None
 CLOSURE_COMPILER = None
 EMSCRIPTEN_NATIVE_OPTIMIZER = None
 JAVA = None
+JS_ENGINE = None
 JS_ENGINES = []
 WASMER = None
 WASMTIME = None
@@ -1730,6 +1741,7 @@ if SPIDERMONKEY_ENGINE:
   SPIDERMONKEY_ENGINE = fix_js_engine(SPIDERMONKEY_ENGINE, new_spidermonkey)
 NODE_JS = fix_js_engine(NODE_JS, listify(NODE_JS))
 V8_ENGINE = fix_js_engine(V8_ENGINE, listify(V8_ENGINE))
+JS_ENGINE = fix_js_engine(JS_ENGINE, listify(JS_ENGINE))
 JS_ENGINES = [listify(engine) for engine in JS_ENGINES]
 WASM_ENGINES = [listify(engine) for engine in WASM_ENGINES]
 if not CACHE:
